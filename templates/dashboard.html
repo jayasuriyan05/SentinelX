@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SentinelX SOC Dashboard</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #080b12;
+            color: #e6edf3;
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            width: 250px;
+            background: #0d111a;
+            border-right: 1px solid #1c2633;
+            padding: 25px 15px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+        }
+
+        .logo {
+            color: #00d4ff;
+            font-size: 25px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .logo-subtitle {
+            text-align: center;
+            color: #6f7d8c;
+            font-size: 11px;
+            margin-bottom: 30px;
+        }
+
+        .nav-title {
+            color: #566473;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin: 15px 10px 8px;
+        }
+
+        .nav-link {
+            display: block;
+            text-decoration: none;
+            color: #aab6c4;
+            padding: 12px 14px;
+            border-radius: 7px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #111d2a;
+            color: #00d4ff;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 28px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 13px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #0d151d;
+            border: 1px solid #1d3541;
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #9defff;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00d4ff;
+            box-shadow: 0 0 8px #00d4ff;
+        }
+
+        /* =========================
+           STAT CARDS
+        ========================= */
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #0d111a;
+            border: 1px solid #1b2633;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .stat-card:hover {
+            border-color: #263b4d;
+        }
+
+        .stat-title {
+            color: #788697;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 30px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .stat-description {
+            color: #667585;
+            font-size: 11px;
+            margin-top: 7px;
+        }
+
+        .cyan {
+            color: #00d4ff;
+        }
+
+        .red {
+            color: #ff5c6c;
+        }
+
+        .orange {
+            color: #ffb454;
+        }
+
+        .green {
+            color: #42d392;
+        }
+
+        /* =========================
+           GRID
+        ========================= */
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .card {
+            background: #0d111a;
+            border: 1px solid #1b2633;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .card.full {
+            grid-column: 1 / -1;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+        }
+
+        .card-header span {
+            color: #617080;
+            font-size: 11px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 270px;
+        }
+
+        /* =========================
+           ALERT TABLE
+        ========================= */
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+            color: #687789;
+            font-size: 11px;
+            text-transform: uppercase;
+            padding: 11px;
+            border-bottom: 1px solid #1b2633;
+        }
+
+        td {
+            padding: 13px 11px;
+            border-bottom: 1px solid #141d28;
+            font-size: 13px;
+        }
+
+        tr:hover {
+            background: #101720;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 5px;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .badge-high {
+            background: #32171b;
+            color: #ff6574;
+        }
+
+        .badge-medium {
+            background: #302615;
+            color: #ffbd61;
+        }
+
+        .badge-low {
+            background: #132a21;
+            color: #52d99a;
+        }
+
+        .badge-critical {
+            background: #3a1015;
+            color: #ff4054;
+        }
+
+        .badge-new {
+            background: #102c39;
+            color: #00d4ff;
+        }
+
+        .badge-open {
+            background: #302615;
+            color: #ffbd61;
+        }
+
+        /* =========================
+           MITRE
+        ========================= */
+
+        .mitre-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mitre-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: #101620;
+            border: 1px solid #1b2633;
+            border-radius: 7px;
+        }
+
+        .mitre-info strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 4px;
+        }
+
+        .mitre-info small {
+            color: #69798a;
+        }
+
+        .mitre-count {
+            color: #00d4ff;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* =========================
+           EMPTY
+        ========================= */
+
+        .empty {
+            text-align: center;
+            color: #637282;
+            padding: 30px;
+            font-size: 13px;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 1100px) {
+
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .layout {
+                display: block;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="layout">
+
+
+        <!-- =========================
+         SIDEBAR
+    ========================= -->
+
+        <aside class="sidebar">
+
+            <div class="logo">
+                SENTINELX
+            </div>
+
+            <div class="logo-subtitle">
+                SOC SECURITY PLATFORM
+            </div>
+
+
+            <div class="nav-title">
+                Monitoring
+            </div>
+
+            <a href="/dashboard" class="nav-link active">
+                Dashboard
+            </a>
+
+            <a href="/live-logs" class="nav-link">
+                Live Logs
+            </a>
+
+            <a href="/alerts" class="nav-link">
+                Alerts
+            </a>
+
+            <a href="/incidents" class="nav-link">
+                Incidents
+            </a>
+
+
+            <div class="nav-title">
+                Investigation
+            </div>
+
+            <a href="/attack-stories" class="nav-link">
+                Attack Stories
+            </a>
+
+            <a href="/mitre" class="nav-link">
+                MITRE ATT&CK
+            </a>
+
+            <a href="/reports" class="nav-link">
+                Reports
+            </a>
+
+
+            <div class="nav-title">
+                Simulation
+            </div>
+
+            <a href="/attack-simulation" class="nav-link">
+                Attack Simulation
+            </a>
+
+        </aside>
+
+
+        <!-- =========================
+         MAIN CONTENT
+    ========================= -->
+
+        <main class="main">
+
+
+            <!-- HEADER -->
+
+            <div class="header">
+
+                <div>
+
+                    <h1>
+                        SentinelX SOC Dashboard
+                    </h1>
+
+                    <p>
+                        Explainable Security Monitoring and Attack Detection Platform
+                    </p>
+
+                </div>
+
+
+                <div class="status">
+
+                    <span class="status-dot"></span>
+
+                    Monitoring Active
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+             PRIMARY STATISTICS
+        ========================= -->
+
+            <section class="stats">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        Total Events
+                    </div>
+
+                    <div class="stat-value cyan">
+                        {{ total_events }}
+                    </div>
+
+                    <div class="stat-description">
+                        Security events collected
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        Total Alerts
+                    </div>
+
+                    <div class="stat-value red">
+                        {{ total_alerts }}
+                    </div>
+
+                    <div class="stat-description">
+                        Detected security alerts
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        Total Incidents
+                    </div>
+
+                    <div class="stat-value orange">
+                        {{ total_incidents }}
+                    </div>
+
+                    <div class="stat-description">
+                        Security incidents
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        Open Incidents
+                    </div>
+
+                    <div class="stat-value green">
+                        {{ open_incidents }}
+                    </div>
+
+                    <div class="stat-description">
+                        Incidents requiring investigation
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- =========================
+             SECONDARY STATISTICS
+        ========================= -->
+
+            <section class="stats">
+
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        Critical Alerts
+                    </div>
+
+                    <div class="stat-value red">
+                        {{ critical_alerts }}
+                    </div>
+
+                    <div class="stat-description">
+                        Highest risk detections
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        High Alerts
+                    </div>
+
+                    <div class="stat-value orange">
+                        {{ high_alerts }}
+                    </div>
+
+                    <div class="stat-description">
+                        High severity detections
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        New Alerts
+                    </div>
+
+                    <div class="stat-value cyan">
+                        {{ new_alerts }}
+                    </div>
+
+                    <div class="stat-description">
+                        Alerts awaiting review
+                    </div>
+
+                </div>
+
+
+                <div class="stat-card">
+
+                    <div class="stat-title">
+                        System Status
+                    </div>
+
+                    <div class="stat-value green">
+                        ONLINE
+                    </div>
+
+                    <div class="stat-description">
+                        SentinelX engine operational
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- =========================
+             CHARTS
+        ========================= -->
+
+            <section class="grid">
+
+
+                <!-- ALERT TYPES -->
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <h2>
+                            Alert Types
+                        </h2>
+
+                        <span>
+                            Detection distribution
+                        </span>
+
+                    </div>
+
+
+                    <div class="chart-container">
+
+                        <canvas id="alertTypeChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+                <!-- SEVERITY -->
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <h2>
+                            Severity Distribution
+                        </h2>
+
+                        <span>
+                            Risk classification
+                        </span>
+
+                    </div>
+
+
+                    <div class="chart-container">
+
+                        <canvas id="severityChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- =========================
+             EVENT TIMELINE
+        ========================= -->
+
+            <section class="card full">
+
+                <div class="card-header">
+
+                    <h2>
+                        Security Event Timeline
+                    </h2>
+
+                    <span>
+                        Recent activity
+                    </span>
+
+                </div>
+
+
+                <div class="chart-container">
+
+                    <canvas id="timelineChart"></canvas>
+
+                </div>
+
+            </section>
+
+
+            <br>
+
+
+            <!-- =========================
+             RECENT ALERTS
+        ========================= -->
+
+            <section class="card full">
+
+                <div class="card-header">
+
+                    <h2>
+                        Recent Security Alerts
+                    </h2>
+
+                    <span>
+                        Latest detections
+                    </span>
+
+                </div>
+
+
+                <div class="table-container">
+
+
+                    {% if recent_alerts %}
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    Alert Type
+                                </th>
+
+                                <th>
+                                    Severity
+                                </th>
+
+                                <th>
+                                    MITRE
+                                </th>
+
+                                <th>
+                                    Risk
+                                </th>
+
+                                <th>
+                                    Source IP
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Time
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            {% for alert in recent_alerts %}
+
+                            <tr>
+
+
+                                <td>
+
+                                    <strong>
+                                        {{ alert.alert_type }}
+                                    </strong>
+
+                                </td>
+
+
+                                <td>
+
+
+                                    {% if alert.severity == "CRITICAL" %}
+
+                                    <span class="badge badge-critical">
+                                        CRITICAL
+                                    </span>
+
+
+                                    {% elif alert.severity == "HIGH" %}
+
+                                    <span class="badge badge-high">
+                                        HIGH
+                                    </span>
+
+
+                                    {% elif alert.severity == "MEDIUM" %}
+
+                                    <span class="badge badge-medium">
+                                        MEDIUM
+                                    </span>
+
+
+                                    {% else %}
+
+                                    <span class="badge badge-low">
+                                        LOW
+                                    </span>
+
+                                    {% endif %}
+
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ alert.mitre_technique or "—" }}
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ alert.risk_score }}
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ alert.source_ip or "—" }}
+
+                                </td>
+
+
+                                <td>
+
+
+                                    {% if alert.status == "New" %}
+
+                                    <span class="badge badge-new">
+                                        New
+                                    </span>
+
+
+                                    {% else %}
+
+                                    <span class="badge badge-open">
+                                        {{ alert.status }}
+                                    </span>
+
+                                    {% endif %}
+
+
+                                </td>
+
+
+                                <td>
+
+                                    {{ alert.timestamp }}
+
+                                </td>
+
+
+                            </tr>
+
+                            {% endfor %}
+
+
+                        </tbody>
+
+                    </table>
+
+
+                    {% else %}
+
+
+                    <div class="empty">
+
+                        No security alerts detected yet.
+
+                    </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+            </section>
+
+
+            <br>
+
+
+            <!-- =========================
+             MITRE + INCIDENT RISK
+        ========================= -->
+
+            <section class="grid">
+
+
+                <!-- MITRE -->
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <h2>
+                            MITRE ATT&CK Activity
+                        </h2>
+
+                        <span>
+                            Technique detections
+                        </span>
+
+                    </div>
+
+
+                    <div class="mitre-list">
+
+
+                        {% if mitre_data %}
+
+
+                        {% for technique, count in mitre_data.items() %}
+
+
+                        <div class="mitre-item">
+
+
+                            <div class="mitre-info">
+
+                                <strong>
+                                    {{ technique }}
+                                </strong>
+
+                                <small>
+                                    MITRE ATT&CK Technique
+                                </small>
+
+                            </div>
+
+
+                            <div class="mitre-count">
+
+                                {{ count }}
+
+                            </div>
+
+
+                        </div>
+
+
+                        {% endfor %}
+
+
+                        {% else %}
+
+
+                        <div class="empty">
+
+                            No MITRE ATT&CK activity available.
+
+                        </div>
+
+
+                        {% endif %}
+
+
+                    </div>
+
+                </div>
+
+
+                <!-- INCIDENT RISK -->
+
+                <div class="card">
+
+                    <div class="card-header">
+
+                        <h2>
+                            Incident Risk
+                        </h2>
+
+                        <span>
+                            Current incident status
+                        </span>
+
+                    </div>
+
+
+                    <div class="chart-container">
+
+                        <canvas id="incidentRiskChart"></canvas>
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+        </main>
+
+    </div>
+
+
+    <!-- =====================================================
+     DASHBOARD DATA
+     ===================================================== -->
+
+    <div id="dashboard-data" data-alert-types='{{ alert_type_data | tojson | safe }}'
+        data-severity='{{ severity_data | tojson | safe }}' data-timeline='{{ event_timeline | tojson | safe }}'
+        data-risk='{{ incident_risk | default(0) | tojson | safe }}' style="display:none;">
+    </div>
+
+
+    <script>
+
+
+        /* =====================================================
+           READ DASHBOARD DATA
+           ===================================================== */
+
+        const dashboardElement =
+            document.getElementById("dashboard-data");
+
+
+        let alertTypeData = {};
+        let severityData = {};
+        let eventTimeline = [];
+        let incidentRisk = 0;
+
+
+        try {
+
+            alertTypeData = JSON.parse(
+                dashboardElement.dataset.alertTypes || "{}"
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Unable to read alert type data:",
+                error
+            );
+
+            alertTypeData = {};
+
+        }
+
+
+        try {
+
+            severityData = JSON.parse(
+                dashboardElement.dataset.severity || "{}"
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Unable to read severity data:",
+                error
+            );
+
+            severityData = {};
+
+        }
+
+
+        try {
+
+            eventTimeline = JSON.parse(
+                dashboardElement.dataset.timeline || "[]"
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Unable to read timeline data:",
+                error
+            );
+
+            eventTimeline = [];
+
+        }
+
+
+        try {
+
+            incidentRisk = Number(
+                dashboardElement.dataset.risk || 0
+            );
+
+        } catch (error) {
+
+            console.error(
+                "Unable to read incident risk:",
+                error
+            );
+
+            incidentRisk = 0;
+
+        }
+
+
+        /* =====================================================
+           ALERT TYPE CHART
+           ===================================================== */
+
+        const alertTypeLabels =
+            Object.keys(alertTypeData || {});
+
+
+        const alertTypeValues =
+            Object.values(alertTypeData || {});
+
+
+        const alertTypeCanvas =
+            document.getElementById("alertTypeChart");
+
+
+        if (alertTypeCanvas) {
+
+            new Chart(
+                alertTypeCanvas,
+                {
+
+                    type: "doughnut",
+
+                    data: {
+
+                        labels: alertTypeLabels,
+
+                        datasets: [{
+
+                            data: alertTypeValues,
+
+                            borderWidth: 1
+
+                        }]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        plugins: {
+
+                            legend: {
+
+                                position: "bottom",
+
+                                labels: {
+
+                                    color: "#aab6c4",
+
+                                    padding: 15
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           SEVERITY CHART
+           ===================================================== */
+
+        const severityLabels =
+            Object.keys(severityData || {});
+
+
+        const severityValues =
+            Object.values(severityData || {});
+
+
+        const severityCanvas =
+            document.getElementById("severityChart");
+
+
+        if (severityCanvas) {
+
+            new Chart(
+                severityCanvas,
+                {
+
+                    type: "bar",
+
+                    data: {
+
+                        labels: severityLabels,
+
+                        datasets: [{
+
+                            label: "Alerts",
+
+                            data: severityValues,
+
+                            borderWidth: 1
+
+                        }]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        scales: {
+
+                            x: {
+
+                                ticks: {
+
+                                    color: "#8996a5"
+
+                                },
+
+                                grid: {
+
+                                    color: "#18212c"
+
+                                }
+
+                            },
+
+                            y: {
+
+                                beginAtZero: true,
+
+                                ticks: {
+
+                                    color: "#8996a5"
+
+                                },
+
+                                grid: {
+
+                                    color: "#18212c"
+
+                                }
+
+                            }
+
+                        },
+
+                        plugins: {
+
+                            legend: {
+
+                                labels: {
+
+                                    color: "#aab6c4"
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           EVENT TIMELINE
+           ===================================================== */
+
+        let timelineLabels = [];
+        let timelineValues = [];
+
+
+        if (Array.isArray(eventTimeline)) {
+
+
+            eventTimeline.forEach(function (item) {
+
+
+                if (
+                    item !== null &&
+                    typeof item === "object"
+                ) {
+
+
+                    timelineLabels.push(
+
+                        item.label ||
+
+                        item.timestamp ||
+
+                        item.time ||
+
+                        ""
+
+                    );
+
+
+                    timelineValues.push(
+
+                        item.count ||
+
+                        item.value ||
+
+                        1
+
+                    );
+
+
+                } else {
+
+
+                    timelineLabels.push("");
+
+                    timelineValues.push(item || 0);
+
+
+                }
+
+
+            });
+
+
+        } else if (
+            eventTimeline &&
+            typeof eventTimeline === "object"
+        ) {
+
+
+            timelineLabels =
+                Object.keys(eventTimeline);
+
+
+            timelineValues =
+                Object.values(eventTimeline);
+
+
+        }
+
+
+        const timelineCanvas =
+            document.getElementById("timelineChart");
+
+
+        if (timelineCanvas) {
+
+            new Chart(
+                timelineCanvas,
+                {
+
+                    type: "line",
+
+                    data: {
+
+                        labels: timelineLabels,
+
+                        datasets: [{
+
+                            label: "Security Events",
+
+                            data: timelineValues,
+
+                            tension: 0.35,
+
+                            fill: false,
+
+                            borderWidth: 2
+
+                        }]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        scales: {
+
+                            x: {
+
+                                ticks: {
+
+                                    color: "#8996a5"
+
+                                },
+
+                                grid: {
+
+                                    color: "#18212c"
+
+                                }
+
+                            },
+
+                            y: {
+
+                                beginAtZero: true,
+
+                                ticks: {
+
+                                    color: "#8996a5"
+
+                                },
+
+                                grid: {
+
+                                    color: "#18212c"
+
+                                }
+
+                            }
+
+                        },
+
+                        plugins: {
+
+                            legend: {
+
+                                labels: {
+
+                                    color: "#aab6c4"
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+
+        /* =====================================================
+           INCIDENT RISK CHART
+           ===================================================== */
+
+        const incidentRiskCanvas =
+            document.getElementById("incidentRiskChart");
+
+
+        if (incidentRiskCanvas) {
+
+
+            const safeRisk =
+                Math.min(
+                    Math.max(
+                        Number(incidentRisk) || 0,
+                        0
+                    ),
+                    100
+                );
+
+
+            new Chart(
+                incidentRiskCanvas,
+                {
+
+                    type: "doughnut",
+
+                    data: {
+
+                        labels: [
+                            "Risk Score",
+                            "Remaining"
+                        ],
+
+                        datasets: [{
+
+                            data: [
+
+                                safeRisk,
+
+                                100 - safeRisk
+
+                            ],
+
+                            borderWidth: 1
+
+                        }]
+
+                    },
+
+                    options: {
+
+                        responsive: true,
+
+                        maintainAspectRatio: false,
+
+                        cutout: "70%",
+
+                        plugins: {
+
+                            legend: {
+
+                                position: "bottom",
+
+                                labels: {
+
+                                    color: "#aab6c4"
+
+                                }
+
+                            }
+
+                        }
+
+                    }
+
+                }
+            );
+
+        }
+
+
+    </script>
+
+
+</body>
+
+</html>
