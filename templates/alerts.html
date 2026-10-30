@@ -1,0 +1,963 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SentinelX - Alerts</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #080b12;
+            color: #e6edf3;
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 250px;
+            background: #0d111a;
+            border-right: 1px solid #1c2633;
+
+            padding: 25px 15px;
+
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+
+            overflow-y: auto;
+        }
+
+        .logo {
+            color: #00d4ff;
+            font-size: 25px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .logo-subtitle {
+            text-align: center;
+            color: #6f7d8c;
+            font-size: 11px;
+            margin-bottom: 30px;
+        }
+
+        .nav-title {
+            color: #566473;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin: 15px 10px 8px;
+        }
+
+        .nav-link {
+            display: block;
+            text-decoration: none;
+            color: #aab6c4;
+
+            padding: 12px 14px;
+
+            border-radius: 7px;
+            margin-bottom: 5px;
+
+            font-size: 14px;
+
+            transition: 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #111d2a;
+            color: #00d4ff;
+        }
+
+        /* MAIN */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 28px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 13px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            background: #0d151d;
+            border: 1px solid #1d3541;
+
+            padding: 10px 15px;
+            border-radius: 20px;
+
+            font-size: 13px;
+            color: #9defff;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+
+            background: #00d4ff;
+            box-shadow: 0 0 8px #00d4ff;
+        }
+
+        /* SUMMARY */
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: #0d111a;
+
+            border: 1px solid #1b2633;
+            border-radius: 10px;
+
+            padding: 18px;
+        }
+
+        .summary-title {
+            color: #788697;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .cyan {
+            color: #00d4ff;
+        }
+
+        .red {
+            color: #ff5c6c;
+        }
+
+        .orange {
+            color: #ffb454;
+        }
+
+        .green {
+            color: #42d392;
+        }
+
+        /* CARD */
+
+        .card {
+            background: #0d111a;
+
+            border: 1px solid #1b2633;
+
+            border-radius: 10px;
+
+            padding: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 18px;
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+        }
+
+        .card-header span {
+            color: #617080;
+            font-size: 11px;
+        }
+
+        /* TABLE */
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+
+            color: #687789;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            padding: 12px;
+
+            border-bottom: 1px solid #1b2633;
+
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 14px 12px;
+
+            border-bottom: 1px solid #141d28;
+
+            font-size: 12px;
+
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background: #101720;
+        }
+
+        .alert-id {
+            color: #596979;
+        }
+
+        .alert-type {
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        .description {
+            color: #8c99a8;
+            max-width: 330px;
+        }
+
+        .ip {
+            color: #aab6c4;
+        }
+
+        .hostname {
+            color: #7d8a99;
+        }
+
+        .timestamp {
+            color: #657487;
+            font-size: 11px;
+            white-space: nowrap;
+        }
+
+        /* SEVERITY */
+
+        .severity {
+            display: inline-block;
+
+            padding: 5px 9px;
+
+            border-radius: 5px;
+
+            font-size: 9px;
+
+            font-weight: bold;
+        }
+
+        .severity-critical {
+            background: #3b151b;
+            color: #ff5668;
+        }
+
+        .severity-high {
+            background: #342017;
+            color: #ff9f5c;
+        }
+
+        .severity-medium {
+            background: #302b16;
+            color: #ffc85c;
+        }
+
+        .severity-low {
+            background: #14291f;
+            color: #57d99a;
+        }
+
+        /* STATUS */
+
+        .alert-status {
+            display: inline-block;
+
+            padding: 5px 9px;
+
+            border-radius: 5px;
+
+            font-size: 9px;
+
+            font-weight: bold;
+        }
+
+        .status-new {
+            background: #132b38;
+            color: #00d4ff;
+        }
+
+        .status-open {
+            background: #302615;
+            color: #ffb454;
+        }
+
+        .status-resolved {
+            background: #15271f;
+            color: #55d697;
+        }
+
+        .status-closed {
+            background: #1b222b;
+            color: #8995a3;
+        }
+
+        .status-default {
+            background: #17202b;
+            color: #9aa8b7;
+        }
+
+        /* MITRE */
+
+        .mitre {
+            color: #b9a4ff;
+            font-weight: bold;
+            font-size: 11px;
+        }
+
+        .risk {
+            font-weight: bold;
+        }
+
+        .risk-high {
+            color: #ff6574;
+        }
+
+        .risk-medium {
+            color: #ffbd61;
+        }
+
+        .risk-low {
+            color: #55d697;
+        }
+
+        /* EMPTY */
+
+        .empty {
+            text-align: center;
+
+            color: #637282;
+
+            padding: 50px 20px;
+
+            font-size: 13px;
+        }
+
+        .empty-icon {
+            font-size: 30px;
+            color: #354353;
+
+            margin-bottom: 12px;
+        }
+
+        /* FOOTER */
+
+        .footer {
+            margin-top: 18px;
+
+            color: #4f5d6c;
+
+            font-size: 11px;
+
+            text-align: right;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1100px) {
+
+            .summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .layout {
+                display: block;
+            }
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="layout">
+
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+            <div class="logo">
+                SENTINELX
+            </div>
+
+            <div class="logo-subtitle">
+                SOC SECURITY PLATFORM
+            </div>
+
+
+            <div class="nav-title">
+                Monitoring
+            </div>
+
+            <a href="/dashboard" class="nav-link">
+                Dashboard
+            </a>
+
+            <a href="/live-logs" class="nav-link">
+                Live Logs
+            </a>
+
+            <a href="/alerts" class="nav-link active">
+                Alerts
+            </a>
+
+            <a href="/incidents" class="nav-link">
+                Incidents
+            </a>
+
+
+            <div class="nav-title">
+                Investigation
+            </div>
+
+            <a href="/attack-stories" class="nav-link">
+                Attack Stories
+            </a>
+
+            <a href="/mitre" class="nav-link">
+                MITRE ATT&CK
+            </a>
+
+            <a href="/reports" class="nav-link">
+                Reports
+            </a>
+
+
+            <div class="nav-title">
+                Simulation
+            </div>
+
+            <a href="/attack-simulation" class="nav-link">
+                Attack Simulation
+            </a>
+
+        </aside>
+
+
+        <!-- MAIN -->
+
+        <main class="main">
+
+
+            <!-- HEADER -->
+
+            <div class="header">
+
+                <div>
+
+                    <h1>
+                        Security Alerts
+                    </h1>
+
+                    <p>
+                        Detected suspicious activities and security threats
+                    </p>
+
+                </div>
+
+
+                <div class="status">
+
+                    <span class="status-dot"></span>
+
+                    Detection Engine Active
+
+                </div>
+
+            </div>
+
+
+            <!-- SUMMARY -->
+
+            <section class="summary">
+
+
+                <div class="summary-card">
+
+                    <div class="summary-title">
+                        Total Alerts
+                    </div>
+
+                    <div class="summary-value cyan">
+                        {{ alerts|length }}
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-title">
+                        Critical
+                    </div>
+
+                    <div class="summary-value red">
+
+                        {{
+                        alerts
+                        |selectattr("severity", "equalto", "CRITICAL")
+                        |list
+                        |length
+                        }}
+
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-title">
+                        High
+                    </div>
+
+                    <div class="summary-value orange">
+
+                        {{
+                        alerts
+                        |selectattr("severity", "equalto", "HIGH")
+                        |list
+                        |length
+                        }}
+
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-title">
+                        New Alerts
+                    </div>
+
+                    <div class="summary-value green">
+
+                        {{
+                        alerts
+                        |selectattr("status", "equalto", "New")
+                        |list
+                        |length
+                        }}
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- ALERT TABLE -->
+
+            <section class="card">
+
+
+                <div class="card-header">
+
+                    <h2>
+                        Alert Queue
+                    </h2>
+
+                    <span>
+                        Latest detections
+                    </span>
+
+                </div>
+
+
+                <div class="table-container">
+
+
+                    {% if alerts %}
+
+
+                    <table>
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    ID
+                                </th>
+
+                                <th>
+                                    Alert Type
+                                </th>
+
+                                <th>
+                                    Severity
+                                </th>
+
+                                <th>
+                                    Description
+                                </th>
+
+                                <th>
+                                    MITRE
+                                </th>
+
+                                <th>
+                                    Risk
+                                </th>
+
+                                <th>
+                                    Source IP
+                                </th>
+
+                                <th>
+                                    Hostname
+                                </th>
+
+                                <th>
+                                    Status
+                                </th>
+
+                                <th>
+                                    Timestamp
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            {% for alert in alerts %}
+
+
+                            <tr>
+
+
+                                <!-- ID -->
+
+                                <td class="alert-id">
+                                    #{{ alert.id }}
+                                </td>
+
+
+                                <!-- ALERT TYPE -->
+
+                                <td class="alert-type">
+                                    {{ alert.alert_type }}
+                                </td>
+
+
+                                <!-- SEVERITY -->
+
+                                <td>
+
+                                    {% if alert.severity == "CRITICAL" %}
+
+                                    <span class="severity severity-critical">
+                                        CRITICAL
+                                    </span>
+
+                                    {% elif alert.severity == "HIGH" %}
+
+                                    <span class="severity severity-high">
+                                        HIGH
+                                    </span>
+
+                                    {% elif alert.severity == "MEDIUM" %}
+
+                                    <span class="severity severity-medium">
+                                        MEDIUM
+                                    </span>
+
+                                    {% elif alert.severity == "LOW" %}
+
+                                    <span class="severity severity-low">
+                                        LOW
+                                    </span>
+
+                                    {% else %}
+
+                                    <span class="severity severity-medium">
+                                        {{ alert.severity or "UNKNOWN" }}
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- DESCRIPTION -->
+
+                                <td class="description" title="{{ alert.description or '' }}">
+
+                                    {{ alert.description or "—" }}
+
+                                </td>
+
+
+                                <!-- MITRE -->
+
+                                <td>
+
+                                    {% if alert.mitre_technique %}
+
+                                    <span class="mitre">
+                                        {{ alert.mitre_technique }}
+                                    </span>
+
+                                    {% else %}
+
+                                    <span style="color:#596979;">
+                                        —
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- RISK -->
+
+                                <td>
+
+                                    {% if alert.risk_score >= 80 %}
+
+                                    <span class="risk risk-high">
+                                        {{ alert.risk_score }}
+                                    </span>
+
+                                    {% elif alert.risk_score >= 50 %}
+
+                                    <span class="risk risk-medium">
+                                        {{ alert.risk_score }}
+                                    </span>
+
+                                    {% else %}
+
+                                    <span class="risk risk-low">
+                                        {{ alert.risk_score }}
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- SOURCE IP -->
+
+                                <td class="ip">
+                                    {{ alert.source_ip or "—" }}
+                                </td>
+
+
+                                <!-- HOSTNAME -->
+
+                                <td class="hostname">
+                                    {{ alert.hostname or "—" }}
+                                </td>
+
+
+                                <!-- STATUS -->
+
+                                <td>
+
+                                    {% if alert.status == "New" %}
+
+                                    <span class="alert-status status-new">
+                                        NEW
+                                    </span>
+
+                                    {% elif alert.status == "Open" %}
+
+                                    <span class="alert-status status-open">
+                                        OPEN
+                                    </span>
+
+                                    {% elif alert.status == "Resolved" %}
+
+                                    <span class="alert-status status-resolved">
+                                        RESOLVED
+                                    </span>
+
+                                    {% elif alert.status == "Closed" %}
+
+                                    <span class="alert-status status-closed">
+                                        CLOSED
+                                    </span>
+
+                                    {% else %}
+
+                                    <span class="alert-status status-default">
+                                        {{ alert.status or "UNKNOWN" }}
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- TIMESTAMP -->
+
+                                <td class="timestamp">
+
+                                    {{ alert.timestamp }}
+
+                                </td>
+
+
+                            </tr>
+
+
+                            {% endfor %}
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                    {% else %}
+
+
+                    <div class="empty">
+
+                        <div class="empty-icon">
+                            ◌
+                        </div>
+
+                        No security alerts have been generated yet.
+
+                        <br><br>
+
+                        Run a controlled attack simulation to
+                        generate detection alerts.
+
+                    </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+            </section>
+
+
+            <div class="footer">
+                SentinelX Security Monitoring Platform
+            </div>
+
+
+        </main>
+
+
+    </div>
+
+
+</body>
+
+</html>
