@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SentinelX - Reports</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #080b12;
+            color: #e6edf3;
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 250px;
+            background: #0d111a;
+            border-right: 1px solid #1d2633;
+            padding: 24px 16px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 5px;
+        }
+
+        .logo-subtitle {
+            color: #7d8a99;
+            font-size: 11px;
+            margin-bottom: 30px;
+        }
+
+        .nav-title {
+            color: #596575;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 18px 10px 10px;
+        }
+
+        .nav a {
+            display: block;
+            text-decoration: none;
+            color: #9aa6b2;
+            padding: 12px 14px;
+            border-radius: 7px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .nav a:hover {
+            background: #151d29;
+            color: #ffffff;
+        }
+
+        .nav a.active {
+            background: #102b35;
+            color: #00d4ff;
+            border-left: 3px solid #00d4ff;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 18px;
+            right: 18px;
+            border-top: 1px solid #1d2633;
+            padding-top: 15px;
+            color: #596575;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        /* MAIN */
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 28px 32px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .header h1 {
+            font-size: 27px;
+            margin-bottom: 7px;
+        }
+
+        .header p {
+            color: #7d8a99;
+            font-size: 14px;
+        }
+
+        .status {
+            padding: 8px 14px;
+            border: 1px solid #1e3d48;
+            border-radius: 20px;
+            color: #00d4ff;
+            font-size: 12px;
+            background: #0c171d;
+        }
+
+        /* CARDS */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 25px;
+        }
+
+        .summary-card {
+            background: #0d111a;
+            border: 1px solid #1d2633;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .summary-card .label {
+            color: #7d8a99;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .summary-card .value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #00d4ff;
+        }
+
+        .content-card {
+            background: #0d111a;
+            border: 1px solid #1d2633;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid #1d2633;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h2 {
+            font-size: 17px;
+        }
+
+        .card-header span {
+            color: #687586;
+            font-size: 12px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        /* INFO */
+        .info-box {
+            background: #0a1119;
+            border: 1px solid #1c2b38;
+            border-left: 3px solid #00d4ff;
+            border-radius: 6px;
+            padding: 16px;
+            color: #aeb9c5;
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        /* TABLE */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #111823;
+            color: #7d8a99;
+            text-align: left;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 13px;
+            border-bottom: 1px solid #1d2633;
+        }
+
+        td {
+            padding: 14px 13px;
+            border-bottom: 1px solid #18212c;
+            font-size: 13px;
+            color: #b8c2cc;
+        }
+
+        tr:hover td {
+            background: #101722;
+        }
+
+        .id {
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        /* BADGES */
+        .badge {
+            display: inline-block;
+            padding: 5px 9px;
+            border-radius: 5px;
+            font-size: 10px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .critical {
+            color: #ff6b6b;
+            background: #30191d;
+        }
+
+        .high {
+            color: #ff9f43;
+            background: #302315;
+        }
+
+        .medium {
+            color: #ffd166;
+            background: #302b16;
+        }
+
+        .low {
+            color: #66d9a3;
+            background: #152b21;
+        }
+
+        .open {
+            color: #ff9f43;
+            background: #302315;
+        }
+
+        .closed {
+            color: #66d9a3;
+            background: #152b21;
+        }
+
+        /* BUTTON */
+        .report-btn {
+            display: inline-block;
+            text-decoration: none;
+            background: #00d4ff;
+            color: #061016;
+            padding: 8px 13px;
+            border-radius: 5px;
+            font-size: 11px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .report-btn:hover {
+            background: #66e5ff;
+        }
+
+        .disabled-btn {
+            display: inline-block;
+            padding: 8px 13px;
+            border-radius: 5px;
+            font-size: 11px;
+            color: #657181;
+            background: #151b24;
+            border: 1px solid #222c38;
+        }
+
+        /* EMPTY STATE */
+        .empty {
+            text-align: center;
+            padding: 45px 20px;
+            color: #657181;
+        }
+
+        .empty-icon {
+            font-size: 35px;
+            margin-bottom: 12px;
+            color: #3c4b5b;
+        }
+
+        .empty h3 {
+            color: #8995a3;
+            margin-bottom: 7px;
+        }
+
+        .empty p {
+            font-size: 13px;
+        }
+
+        /* REPORT FEATURES */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .feature {
+            background: #0a1119;
+            border: 1px solid #1d2633;
+            border-radius: 8px;
+            padding: 17px;
+        }
+
+        .feature h3 {
+            color: #00d4ff;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .feature p {
+            color: #7d8a99;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 1100px) {
+            .summary-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 800px) {
+            .sidebar {
+                width: 210px;
+            }
+
+            .main {
+                margin-left: 210px;
+                width: calc(100% - 210px);
+                padding: 20px;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+            }
+
+            .sidebar-footer {
+                position: static;
+                margin-top: 20px;
+            }
+
+            .layout {
+                display: block;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .summary-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+
+            <div class="logo">SentinelX</div>
+
+            <div class="logo-subtitle">
+                Security Operations Platform
+            </div>
+
+            <div class="nav">
+
+                <div class="nav-title">Monitoring</div>
+
+                <a href="/dashboard">Dashboard</a>
+                <a href="/live-logs">Live Logs</a>
+                <a href="/alerts">Alerts</a>
+                <a href="/incidents">Incidents</a>
+
+                <div class="nav-title">Analysis</div>
+
+                <a href="/attack-stories">Attack Stories</a>
+                <a href="/mitre">MITRE ATT&CK</a>
+
+                <div class="nav-title">Management</div>
+
+                <a href="/reports" class="active">Reports</a>
+                <a href="/attack-simulation">Attack Simulation</a>
+
+            </div>
+
+            <div class="sidebar-footer">
+                SentinelX SOC Dashboard<br>
+                Explainable Security Monitoring<br>
+                &copy; 2026 SentinelX
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN CONTENT -->
+        <main class="main">
+
+            <!-- HEADER -->
+            <div class="header">
+
+                <div>
+                    <h1>Security Reports</h1>
+
+                    <p>
+                        Generate and review security incident reports
+                    </p>
+                </div>
+
+                <div class="status">
+                    REPORTING ENGINE ONLINE
+                </div>
+
+            </div>
+
+
+            <!-- SUMMARY -->
+            <div class="summary-grid">
+
+                <div class="summary-card">
+
+                    <div class="label">
+                        TOTAL INCIDENTS
+                    </div>
+
+                    <div class="value">
+                        {{ incidents|length }}
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="label">
+                        OPEN INCIDENTS
+                    </div>
+
+                    <div class="value">
+                        {{ incidents|selectattr('status', 'equalto', 'Open')|list|length }}
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="label">
+                        HIGH / CRITICAL
+                    </div>
+
+                    <div class="value">
+                        {{
+                        incidents
+                        |selectattr('severity', 'in', ['HIGH', 'CRITICAL'])
+                        |list
+                        |length
+                        }}
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="label">
+                        REPORT FORMAT
+                    </div>
+
+                    <div class="value" style="font-size: 22px;">
+                        PDF
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- REPORT INFORMATION -->
+            <section class="content-card">
+
+                <div class="card-header">
+
+                    <h2>Report Generation</h2>
+
+                    <span>
+                        Incident-based reporting
+                    </span>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="info-box">
+
+                        SentinelX generates structured PDF reports from detected
+                        security incidents. Reports contain incident information,
+                        severity, risk score, source details, timestamps and
+                        security analysis useful for SOC investigation and
+                        documentation.
+
+                    </div>
+
+
+                    <div class="feature-grid">
+
+                        <div class="feature">
+
+                            <h3>Incident Details</h3>
+
+                            <p>
+                                Includes incident title, description, severity,
+                                risk score, source IP, hostname and timestamp.
+                            </p>
+
+                        </div>
+
+
+                        <div class="feature">
+
+                            <h3>Security Analysis</h3>
+
+                            <p>
+                                Provides investigation-oriented information
+                                generated from SentinelX detection and
+                                correlation results.
+                            </p>
+
+                        </div>
+
+
+                        <div class="feature">
+
+                            <h3>PDF Documentation</h3>
+
+                            <p>
+                                Generates a downloadable PDF report that can be
+                                used for incident documentation and project
+                                demonstration.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- INCIDENT REPORTS -->
+            <section class="content-card">
+
+                <div class="card-header">
+
+                    <h2>Available Incident Reports</h2>
+
+                    <span>
+                        Select an incident to generate PDF
+                    </span>
+
+                </div>
+
+
+                {% if incidents %}
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+                                <th>ID</th>
+                                <th>Incident</th>
+                                <th>Severity</th>
+                                <th>Risk Score</th>
+                                <th>Source IP</th>
+                                <th>Status</th>
+                                <th>Timestamp</th>
+                                <th>Report</th>
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+                            {% for incident in incidents %}
+
+                            <tr>
+
+                                <td class="id">
+                                    #{{ incident.id }}
+                                </td>
+
+                                <td>
+                                    {{ incident.title }}
+                                </td>
+
+                                <td>
+
+                                    {% if incident.severity == "CRITICAL" %}
+                                    <span class="badge critical">
+                                        Critical
+                                    </span>
+
+                                    {% elif incident.severity == "HIGH" %}
+                                    <span class="badge high">
+                                        High
+                                    </span>
+
+                                    {% elif incident.severity == "MEDIUM" %}
+                                    <span class="badge medium">
+                                        Medium
+                                    </span>
+
+                                    {% else %}
+                                    <span class="badge low">
+                                        Low
+                                    </span>
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+                                    {{ incident.risk_score }}
+                                </td>
+
+
+                                <td>
+                                    {{ incident.source_ip or "Unknown" }}
+                                </td>
+
+
+                                <td>
+
+                                    {% if incident.status == "Open" %}
+                                    <span class="badge open">
+                                        Open
+                                    </span>
+                                    {% else %}
+                                    <span class="badge closed">
+                                        {{ incident.status }}
+                                    </span>
+                                    {% endif %}
+
+                                </td>
+
+
+                                <td>
+                                    {{ incident.timestamp }}
+                                </td>
+
+
+                                <td>
+
+                                    <a href="/generate-report/{{ incident.id }}" class="report-btn">
+                                        Generate PDF
+                                    </a>
+
+                                </td>
+
+                            </tr>
+
+                            {% endfor %}
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+                {% else %}
+
+                <div class="empty">
+
+                    <div class="empty-icon">
+                        PDF
+                    </div>
+
+                    <h3>No Incidents Available</h3>
+
+                    <p>
+                        Run an attack simulation or generate a security event
+                        to create an incident report.
+                    </p>
+
+                </div>
+
+                {% endif %}
+
+            </section>
+
+
+            <!-- REPORT WORKFLOW -->
+            <section class="content-card">
+
+                <div class="card-header">
+
+                    <h2>Report Workflow</h2>
+
+                    <span>
+                        SentinelX incident documentation
+                    </span>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="feature-grid">
+
+                        <div class="feature">
+
+                            <h3>01. Detect</h3>
+
+                            <p>
+                                Security events are collected and analyzed by
+                                SentinelX detection modules.
+                            </p>
+
+                        </div>
+
+
+                        <div class="feature">
+
+                            <h3>02. Correlate</h3>
+
+                            <p>
+                                Related activities are correlated into an
+                                attack chain and converted into an incident.
+                            </p>
+
+                        </div>
+
+
+                        <div class="feature">
+
+                            <h3>03. Report</h3>
+
+                            <p>
+                                The incident can be converted into a structured
+                                PDF report for investigation and documentation.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+        </main>
+
+    </div>
+
+</body>
+
+</html>
