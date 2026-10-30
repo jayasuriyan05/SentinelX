@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SentinelX - Live Logs</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #080b12;
+            color: #e6edf3;
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            width: 250px;
+            background: #0d111a;
+            border-right: 1px solid #1c2633;
+
+            padding: 25px 15px;
+
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+
+            overflow-y: auto;
+        }
+
+        .logo {
+            color: #00d4ff;
+            font-size: 25px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .logo-subtitle {
+            text-align: center;
+            color: #6f7d8c;
+            font-size: 11px;
+            margin-bottom: 30px;
+        }
+
+        .nav-title {
+            color: #566473;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin: 15px 10px 8px;
+        }
+
+        .nav-link {
+            display: block;
+            text-decoration: none;
+            color: #aab6c4;
+
+            padding: 12px 14px;
+
+            border-radius: 7px;
+            margin-bottom: 5px;
+
+            font-size: 14px;
+
+            transition: 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #111d2a;
+            color: #00d4ff;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 28px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 13px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            background: #0d151d;
+            border: 1px solid #1d3541;
+
+            padding: 10px 15px;
+            border-radius: 20px;
+
+            font-size: 13px;
+            color: #9defff;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+
+            background: #00d4ff;
+
+            box-shadow: 0 0 8px #00d4ff;
+        }
+
+        /* =========================
+           CONTROL BAR
+        ========================= */
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            background: #0d111a;
+            border: 1px solid #1b2633;
+
+            border-radius: 10px;
+
+            padding: 15px 18px;
+
+            margin-bottom: 18px;
+        }
+
+        .controls-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .controls-label {
+            color: #788697;
+            font-size: 12px;
+        }
+
+        .refresh-status {
+            color: #42d392;
+            font-size: 12px;
+        }
+
+        .refresh-button {
+            background: #111d2a;
+            color: #00d4ff;
+
+            border: 1px solid #20394a;
+
+            padding: 9px 15px;
+
+            border-radius: 6px;
+
+            cursor: pointer;
+
+            font-size: 12px;
+        }
+
+        .refresh-button:hover {
+            background: #142536;
+        }
+
+        /* =========================
+           SUMMARY
+        ========================= */
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+
+            gap: 15px;
+
+            margin-bottom: 18px;
+        }
+
+        .summary-card {
+            background: #0d111a;
+
+            border: 1px solid #1b2633;
+
+            border-radius: 10px;
+
+            padding: 18px;
+        }
+
+        .summary-title {
+            color: #788697;
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 25px;
+            font-weight: bold;
+        }
+
+        .cyan {
+            color: #00d4ff;
+        }
+
+        .red {
+            color: #ff5c6c;
+        }
+
+        .orange {
+            color: #ffb454;
+        }
+
+        .green {
+            color: #42d392;
+        }
+
+        /* =========================
+           LOG CARD
+        ========================= */
+
+        .card {
+            background: #0d111a;
+
+            border: 1px solid #1b2633;
+
+            border-radius: 10px;
+
+            padding: 20px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 18px;
+        }
+
+        .card-header h2 {
+            font-size: 16px;
+        }
+
+        .card-header span {
+            color: #617080;
+            font-size: 11px;
+        }
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            text-align: left;
+
+            color: #687789;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            padding: 12px;
+
+            border-bottom: 1px solid #1b2633;
+
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 13px 12px;
+
+            border-bottom: 1px solid #141d28;
+
+            font-size: 12px;
+
+            white-space: nowrap;
+        }
+
+        tbody tr:hover {
+            background: #101720;
+        }
+
+        .event-type {
+            color: #00d4ff;
+            font-weight: bold;
+        }
+
+        .ip {
+            color: #aab6c4;
+        }
+
+        .username {
+            color: #c3ccd6;
+        }
+
+        .hostname {
+            color: #8996a5;
+        }
+
+        .details {
+            color: #718096;
+
+            max-width: 300px;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+        .timestamp {
+            color: #69798a;
+            font-size: 11px;
+        }
+
+        /* =========================
+           EVENT BADGES
+        ========================= */
+
+        .badge {
+            display: inline-block;
+
+            padding: 5px 8px;
+
+            border-radius: 5px;
+
+            font-size: 9px;
+
+            font-weight: bold;
+
+            letter-spacing: 0.3px;
+        }
+
+        .badge-failed {
+            background: #32171b;
+            color: #ff6574;
+        }
+
+        .badge-success {
+            background: #132a21;
+            color: #52d99a;
+        }
+
+        .badge-powershell {
+            background: #102c39;
+            color: #00d4ff;
+        }
+
+        .badge-privileged {
+            background: #302615;
+            color: #ffbd61;
+        }
+
+        .badge-file {
+            background: #242033;
+            color: #b9a4ff;
+        }
+
+        .badge-port {
+            background: #302015;
+            color: #ff9d5c;
+        }
+
+        .badge-default {
+            background: #17202b;
+            color: #9aa8b7;
+        }
+
+        /* =========================
+           EMPTY STATE
+        ========================= */
+
+        .empty {
+            text-align: center;
+
+            color: #637282;
+
+            padding: 45px 20px;
+
+            font-size: 13px;
+        }
+
+        .empty-icon {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #354353;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            margin-top: 18px;
+
+            color: #4f5d6c;
+
+            font-size: 11px;
+
+            text-align: right;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 1100px) {
+
+            .summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+            }
+
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                height: auto;
+            }
+
+            .layout {
+                display: block;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="layout">
+
+
+        <!-- =========================
+         SIDEBAR
+    ========================= -->
+
+        <aside class="sidebar">
+
+            <div class="logo">
+                SENTINELX
+            </div>
+
+            <div class="logo-subtitle">
+                SOC SECURITY PLATFORM
+            </div>
+
+
+            <div class="nav-title">
+                Monitoring
+            </div>
+
+            <a href="/dashboard" class="nav-link">
+                Dashboard
+            </a>
+
+            <a href="/live-logs" class="nav-link active">
+                Live Logs
+            </a>
+
+            <a href="/alerts" class="nav-link">
+                Alerts
+            </a>
+
+            <a href="/incidents" class="nav-link">
+                Incidents
+            </a>
+
+
+            <div class="nav-title">
+                Investigation
+            </div>
+
+            <a href="/attack-stories" class="nav-link">
+                Attack Stories
+            </a>
+
+            <a href="/mitre" class="nav-link">
+                MITRE ATT&CK
+            </a>
+
+            <a href="/reports" class="nav-link">
+                Reports
+            </a>
+
+
+            <div class="nav-title">
+                Simulation
+            </div>
+
+            <a href="/attack-simulation" class="nav-link">
+                Attack Simulation
+            </a>
+
+        </aside>
+
+
+        <!-- =========================
+         MAIN
+    ========================= -->
+
+        <main class="main">
+
+
+            <!-- HEADER -->
+
+            <div class="header">
+
+                <div>
+
+                    <h1>
+                        Live Security Logs
+                    </h1>
+
+                    <p>
+                        Real-time security event monitoring and telemetry
+                    </p>
+
+                </div>
+
+
+                <div class="status">
+
+                    <span class="status-dot"></span>
+
+                    Log Monitoring Active
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+             CONTROLS
+        ========================= -->
+
+            <div class="controls">
+
+                <div class="controls-left">
+
+                    <span class="controls-label">
+                        Event Stream
+                    </span>
+
+                    <span class="refresh-status">
+                        ● Auto Refresh
+                    </span>
+
+                </div>
+
+
+                <button class="refresh-button" onclick="window.location.reload();">
+                    Refresh Logs
+                </button>
+
+            </div>
+
+
+            <!-- =========================
+             SUMMARY
+        ========================= -->
+
+            <section class="summary">
+
+
+                <div class="summary-card">
+
+                    <div class="summary-title">
+                        Total Events
+                    </div>
+
+                    <div class="summary-value cyan">
+                        {{ events|length }}
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-title">
+                        Failed Logins
+                    </div>
+
+                    <div class="summary-value red">
+
+                        {{ events|selectattr("event_type", "equalto", "FAILED_LOGIN")|list|length }}
+
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-title">
+                        Successful Logins
+                    </div>
+
+                    <div class="summary-value green">
+
+                        {{ events|selectattr("event_type", "equalto", "SUCCESSFUL_LOGIN")|list|length }}
+
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-title">
+                        Suspicious Activity
+                    </div>
+
+                    <div class="summary-value orange">
+
+                        {{
+                        events
+                        |selectattr("event_type", "in", [
+                        "POWERSHELL",
+                        "PRIVILEGED_ACTIVITY",
+                        "SUSPICIOUS_FILE_ACCESS",
+                        "PORT_SCAN"
+                        ])
+                        |list
+                        |length
+                        }}
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- =========================
+             LOG TABLE
+        ========================= -->
+
+            <section class="card">
+
+
+                <div class="card-header">
+
+                    <h2>
+                        Security Event Stream
+                    </h2>
+
+                    <span>
+                        Latest events first
+                    </span>
+
+                </div>
+
+
+                <div class="table-container">
+
+
+                    {% if events %}
+
+
+                    <table>
+
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    ID
+                                </th>
+
+                                <th>
+                                    Event Type
+                                </th>
+
+                                <th>
+                                    Source IP
+                                </th>
+
+                                <th>
+                                    Destination IP
+                                </th>
+
+                                <th>
+                                    Username
+                                </th>
+
+                                <th>
+                                    Hostname
+                                </th>
+
+                                <th>
+                                    Details
+                                </th>
+
+                                <th>
+                                    Timestamp
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                            {% for event in events %}
+
+
+                            <tr>
+
+
+                                <!-- ID -->
+
+                                <td>
+                                    #{{ event.id }}
+                                </td>
+
+
+                                <!-- EVENT TYPE -->
+
+                                <td>
+
+                                    {% if event.event_type == "FAILED_LOGIN" %}
+
+                                    <span class="badge badge-failed">
+                                        FAILED LOGIN
+                                    </span>
+
+
+                                    {% elif event.event_type == "SUCCESSFUL_LOGIN" %}
+
+                                    <span class="badge badge-success">
+                                        SUCCESSFUL LOGIN
+                                    </span>
+
+
+                                    {% elif event.event_type == "POWERSHELL" %}
+
+                                    <span class="badge badge-powershell">
+                                        POWERSHELL
+                                    </span>
+
+
+                                    {% elif event.event_type == "PRIVILEGED_ACTIVITY" %}
+
+                                    <span class="badge badge-privileged">
+                                        PRIVILEGED ACTIVITY
+                                    </span>
+
+
+                                    {% elif event.event_type == "FILE_ACCESS" %}
+
+                                    <span class="badge badge-file">
+                                        FILE ACCESS
+                                    </span>
+
+
+                                    {% elif event.event_type == "SUSPICIOUS_FILE_ACCESS" %}
+
+                                    <span class="badge badge-file">
+                                        SUSPICIOUS FILE ACCESS
+                                    </span>
+
+
+                                    {% elif event.event_type == "PORT_SCAN" %}
+
+                                    <span class="badge badge-port">
+                                        PORT SCAN
+                                    </span>
+
+
+                                    {% else %}
+
+                                    <span class="badge badge-default">
+                                        {{ event.event_type }}
+                                    </span>
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- SOURCE IP -->
+
+                                <td class="ip">
+
+                                    {{ event.source_ip or "—" }}
+
+                                </td>
+
+
+                                <!-- DESTINATION IP -->
+
+                                <td class="ip">
+
+                                    {{ event.destination_ip or "—" }}
+
+                                </td>
+
+
+                                <!-- USERNAME -->
+
+                                <td class="username">
+
+                                    {{ event.username or "—" }}
+
+                                </td>
+
+
+                                <!-- HOSTNAME -->
+
+                                <td class="hostname">
+
+                                    {{ event.hostname or "—" }}
+
+                                </td>
+
+
+                                <!-- DETAILS -->
+
+                                <td class="details" title="{{ event.details or '' }}">
+
+                                    {{ event.details or "—" }}
+
+                                </td>
+
+
+                                <!-- TIMESTAMP -->
+
+                                <td class="timestamp">
+
+                                    {{ event.timestamp }}
+
+                                </td>
+
+
+                            </tr>
+
+
+                            {% endfor %}
+
+
+                        </tbody>
+
+
+                    </table>
+
+
+                    {% else %}
+
+
+                    <div class="empty">
+
+                        <div class="empty-icon">
+                            ◌
+                        </div>
+
+                        No security events have been recorded yet.
+
+                        <br><br>
+
+                        Use the Attack Simulation page to generate
+                        controlled security events.
+
+                    </div>
+
+
+                    {% endif %}
+
+
+                </div>
+
+
+            </section>
+
+
+            <div class="footer">
+
+                SentinelX Security Monitoring Platform
+
+            </div>
+
+
+        </main>
+
+
+    </div>
+
+
+    <!-- =========================
+     AUTO REFRESH
+========================= -->
+
+    <script>
+
+        /*
+         * Refresh the live log page every 10 seconds.
+         *
+         * This only refreshes the dashboard page and does not
+         * execute or create any security activity.
+         */
+
+        setTimeout(function () {
+
+            window.location.reload();
+
+        }, 10000);
+
+    </script>
+
+
+</body>
+
+</html>
