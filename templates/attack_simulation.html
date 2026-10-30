@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SentinelX - Attack Simulation</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #080b12;
+            color: #e6edf3;
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* SIDEBAR */
+
+        .sidebar {
+            width: 250px;
+            background: #0d111a;
+            border-right: 1px solid #1d2633;
+            padding: 24px 16px;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+        }
+
+        .logo {
+            font-size: 25px;
+            font-weight: bold;
+            color: #00d4ff;
+            margin-bottom: 5px;
+        }
+
+        .logo-subtitle {
+            color: #7d8a99;
+            font-size: 11px;
+            margin-bottom: 30px;
+        }
+
+        .nav-title {
+            color: #596575;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 18px 10px 10px;
+        }
+
+        .nav a {
+            display: block;
+            text-decoration: none;
+            color: #9aa6b2;
+            padding: 12px 14px;
+            border-radius: 7px;
+            margin-bottom: 5px;
+            font-size: 14px;
+            transition: 0.2s;
+        }
+
+        .nav a:hover {
+            background: #151d29;
+            color: #ffffff;
+        }
+
+        .nav a.active {
+            background: #102b35;
+            color: #00d4ff;
+            border-left: 3px solid #00d4ff;
+        }
+
+        .sidebar-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 18px;
+            right: 18px;
+            border-top: 1px solid #1d2633;
+            padding-top: 15px;
+            color: #596575;
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        /* MAIN */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 28px 32px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+        }
+
+        .header h1 {
+            font-size: 27px;
+            margin-bottom: 7px;
+        }
+
+        .header p {
+            color: #7d8a99;
+            font-size: 14px;
+        }
+
+        .status {
+            padding: 8px 14px;
+            border: 1px solid #1e3d48;
+            border-radius: 20px;
+            color: #00d4ff;
+            font-size: 12px;
+            background: #0c171d;
+        }
+
+        /* WARNING */
+
+        .warning {
+            background: #17130d;
+            border: 1px solid #493b20;
+            border-left: 3px solid #ffb84d;
+            border-radius: 8px;
+            padding: 16px 18px;
+            margin-bottom: 22px;
+        }
+
+        .warning h3 {
+            color: #ffb84d;
+            font-size: 14px;
+            margin-bottom: 7px;
+        }
+
+        .warning p {
+            color: #a9a294;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        /* CONFIGURATION */
+
+        .card {
+            background: #0d111a;
+            border: 1px solid #1d2633;
+            border-radius: 10px;
+            margin-bottom: 22px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 18px 20px;
+            border-bottom: 1px solid #1d2633;
+        }
+
+        .card-header h2 {
+            font-size: 17px;
+            margin-bottom: 5px;
+        }
+
+        .card-header p {
+            color: #687586;
+            font-size: 12px;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .input-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+
+        .field label {
+            display: block;
+            color: #8d99a8;
+            font-size: 12px;
+            margin-bottom: 7px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 11px 12px;
+            background: #080d14;
+            border: 1px solid #263342;
+            border-radius: 6px;
+            color: #e6edf3;
+            outline: none;
+        }
+
+        .field input:focus {
+            border-color: #00d4ff;
+        }
+
+        /* SIMULATION GRID */
+
+        .simulation-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .simulation-card {
+            background: #0a1119;
+            border: 1px solid #1d2633;
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .simulation-card h3 {
+            color: #00d4ff;
+            font-size: 15px;
+            margin-bottom: 8px;
+        }
+
+        .simulation-card p {
+            color: #7d8a99;
+            font-size: 12px;
+            line-height: 1.6;
+            min-height: 40px;
+            margin-bottom: 15px;
+        }
+
+        .technique {
+            color: #738090;
+            font-size: 11px;
+            margin-bottom: 13px;
+        }
+
+        .technique span {
+            color: #00d4ff;
+        }
+
+        /* BUTTONS */
+
+        .btn {
+            display: inline-block;
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-primary {
+            background: #00d4ff;
+            color: #061016;
+        }
+
+        .btn-primary:hover {
+            background: #66e5ff;
+        }
+
+        .btn-secondary {
+            background: #17202b;
+            border: 1px solid #2a3745;
+            color: #b8c2cc;
+        }
+
+        .btn-secondary:hover {
+            background: #202b38;
+            color: #ffffff;
+        }
+
+        .btn-danger {
+            background: #32191d;
+            border: 1px solid #5a252c;
+            color: #ff7373;
+        }
+
+        .btn-danger:hover {
+            background: #482025;
+        }
+
+        /* FULL CHAIN */
+
+        .full-chain {
+            background: #0a1119;
+            border: 1px solid #263542;
+            border-radius: 8px;
+            padding: 22px;
+        }
+
+        .full-chain h3 {
+            color: #00d4ff;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .full-chain p {
+            color: #8995a3;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 18px;
+        }
+
+        .chain {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+
+        .step {
+            padding: 9px 12px;
+            background: #111b25;
+            border: 1px solid #263745;
+            border-radius: 5px;
+            color: #aeb9c5;
+            font-size: 11px;
+        }
+
+        .arrow {
+            color: #00d4ff;
+            font-size: 14px;
+        }
+
+        /* RESET */
+
+        .reset-area {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 10px;
+        }
+
+        /* RESPONSIVE */
+
+        @media (max-width: 1000px) {
+
+            .input-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .simulation-grid {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 700px) {
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+            }
+
+            .layout {
+                display: block;
+            }
+
+            .sidebar-footer {
+                position: static;
+                margin-top: 20px;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+                padding: 20px;
+            }
+
+            .header {
+                align-items: flex-start;
+                gap: 15px;
+                flex-direction: column;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="layout">
+
+        <!-- SIDEBAR -->
+
+        <aside class="sidebar">
+
+            <div class="logo">
+                SentinelX
+            </div>
+
+            <div class="logo-subtitle">
+                Security Operations Platform
+            </div>
+
+            <div class="nav">
+
+                <div class="nav-title">
+                    Monitoring
+                </div>
+
+                <a href="/dashboard">
+                    Dashboard
+                </a>
+
+                <a href="/live-logs">
+                    Live Logs
+                </a>
+
+                <a href="/alerts">
+                    Alerts
+                </a>
+
+                <a href="/incidents">
+                    Incidents
+                </a>
+
+                <div class="nav-title">
+                    Analysis
+                </div>
+
+                <a href="/attack-stories">
+                    Attack Stories
+                </a>
+
+                <a href="/mitre">
+                    MITRE ATT&CK
+                </a>
+
+                <div class="nav-title">
+                    Management
+                </div>
+
+                <a href="/reports">
+                    Reports
+                </a>
+
+                <a href="/attack-simulation" class="active">
+                    Attack Simulation
+                </a>
+
+            </div>
+
+            <div class="sidebar-footer">
+                SentinelX SOC Dashboard<br>
+                Explainable Security Monitoring<br>
+                &copy; 2026 SentinelX
+            </div>
+
+        </aside>
+
+
+        <!-- MAIN -->
+
+        <main class="main">
+
+            <div class="header">
+
+                <div>
+
+                    <h1>
+                        Attack Simulation Lab
+                    </h1>
+
+                    <p>
+                        Controlled security-event simulation and detection testing
+                    </p>
+
+                </div>
+
+                <div class="status">
+                    SIMULATION ENGINE READY
+                </div>
+
+            </div>
+
+
+            <!-- WARNING -->
+
+            <div class="warning">
+
+                <h3>
+                    Controlled Simulation Environment
+                </h3>
+
+                <p>
+                    These actions generate simulated security telemetry inside
+                    SentinelX for defensive testing and SOC demonstration.
+                    No real attack is performed and no malicious payload is
+                    executed on the system.
+                </p>
+
+            </div>
+
+
+            <!-- CONFIGURATION -->
+
+            <section class="card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Simulation Configuration
+                    </h2>
+
+                    <p>
+                        Default values can be changed before running simulations.
+                    </p>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="input-grid">
+
+                        <div class="field">
+
+                            <label for="attackerIP">
+                                Attacker IP
+                            </label>
+
+                            <input type="text" id="attackerIP" value="192.168.1.50">
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="targetIP">
+                                Target IP
+                            </label>
+
+                            <input type="text" id="targetIP" value="192.168.1.100">
+
+                        </div>
+
+
+                        <div class="field">
+
+                            <label for="username">
+                                Username
+                            </label>
+
+                            <input type="text" id="username" value="administrator">
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- SIMULATIONS -->
+
+            <section class="card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Individual Attack Simulations
+                    </h2>
+
+                    <p>
+                        Test individual detection modules.
+                    </p>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="simulation-grid">
+
+
+                        <!-- BRUTE FORCE -->
+
+                        <div class="simulation-card">
+
+                            <h3>
+                                Brute Force Simulation
+                            </h3>
+
+                            <p>
+                                Generates repeated failed login events to test
+                                brute-force detection and account lockout logic.
+                            </p>
+
+                            <div class="technique">
+                                MITRE Technique:
+                                <span>T1110</span>
+                            </div>
+
+                            <button class="btn btn-danger" onclick="runSimulation('/simulate-bruteforce')">
+                                Simulate Brute Force
+                            </button>
+
+                        </div>
+
+
+                        <!-- SUCCESS LOGIN -->
+
+                        <div class="simulation-card">
+
+                            <h3>
+                                Successful Login
+                            </h3>
+
+                            <p>
+                                Generates a successful authentication event
+                                after a simulated login sequence.
+                            </p>
+
+                            <div class="technique">
+                                Event:
+                                <span>SUCCESSFUL_LOGIN</span>
+                            </div>
+
+                            <button class="btn btn-primary" onclick="simulateLogin()">
+                                Simulate Login
+                            </button>
+
+                        </div>
+
+
+                        <!-- POWERSHELL -->
+
+                        <div class="simulation-card">
+
+                            <h3>
+                                Suspicious PowerShell
+                            </h3>
+
+                            <p>
+                                Sends simulated PowerShell telemetry containing
+                                a suspicious command pattern.
+                            </p>
+
+                            <div class="technique">
+                                MITRE Technique:
+                                <span>T1059.001</span>
+                            </div>
+
+                            <button class="btn btn-danger" onclick="simulatePowerShell()">
+                                Simulate PowerShell
+                            </button>
+
+                        </div>
+
+
+                        <!-- PRIVILEGED -->
+
+                        <div class="simulation-card">
+
+                            <h3>
+                                Privileged Activity
+                            </h3>
+
+                            <p>
+                                Generates simulated privileged activity and
+                                related file-access telemetry.
+                            </p>
+
+                            <div class="technique">
+                                MITRE Technique:
+                                <span>T1078</span>
+                            </div>
+
+                            <button class="btn btn-danger" onclick="simulatePrivileged()">
+                                Simulate Privileged Activity
+                            </button>
+
+                        </div>
+
+
+                        <!-- FILE ACCESS -->
+
+                        <div class="simulation-card">
+
+                            <h3>
+                                Sensitive File Access
+                            </h3>
+
+                            <p>
+                                Generates simulated access to a sensitive file
+                                path for file-access detection testing.
+                            </p>
+
+                            <div class="technique">
+                                MITRE Technique:
+                                <span>T1005</span>
+                            </div>
+
+                            <button class="btn btn-danger" onclick="simulateFileAccess()">
+                                Simulate File Access
+                            </button>
+
+                        </div>
+
+
+                        <!-- PORT SCAN -->
+
+                        <div class="simulation-card">
+
+                            <h3>
+                                Port Scan
+                            </h3>
+
+                            <p>
+                                Generates simulated network scanning telemetry
+                                to test port-scan detection.
+                            </p>
+
+                            <div class="technique">
+                                MITRE Technique:
+                                <span>T1046</span>
+                            </div>
+
+                            <button class="btn btn-danger" onclick="simulatePortScan()">
+                                Simulate Port Scan
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- FULL ATTACK CHAIN -->
+
+            <section class="card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Full Attack Chain Simulation
+                    </h2>
+
+                    <p>
+                        Run a complete controlled attack sequence.
+                    </p>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="full-chain">
+
+                        <h3>
+                            Automated Attack Story
+                        </h3>
+
+                        <p>
+                            This simulation generates multiple related security
+                            events and allows SentinelX to demonstrate detection,
+                            alert generation, correlation, incident creation and
+                            MITRE ATT&CK mapping.
+                        </p>
+
+
+                        <div class="chain">
+
+                            <div class="step">
+                                Failed Logins
+                            </div>
+
+                            <div class="arrow">
+                                →
+                            </div>
+
+                            <div class="step">
+                                Successful Login
+                            </div>
+
+                            <div class="arrow">
+                                →
+                            </div>
+
+                            <div class="step">
+                                PowerShell
+                            </div>
+
+                            <div class="arrow">
+                                →
+                            </div>
+
+                            <div class="step">
+                                Privileged Activity
+                            </div>
+
+                            <div class="arrow">
+                                →
+                            </div>
+
+                            <div class="step">
+                                File Access
+                            </div>
+
+                            <div class="arrow">
+                                →
+                            </div>
+
+                            <div class="step">
+                                Incident
+                            </div>
+
+                        </div>
+
+
+                        <button class="btn btn-primary" onclick="runFullAttack()">
+                            Run Full Attack Simulation
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+
+            <!-- RESET -->
+
+            <section class="card">
+
+                <div class="card-header">
+
+                    <h2>
+                        Simulation Controls
+                    </h2>
+
+                    <p>
+                        Reset the demonstration lockout state when required.
+                    </p>
+
+                </div>
+
+                <div class="card-body">
+
+                    <div class="reset-area">
+
+                        <button class="btn btn-secondary" onclick="resetLockout()">
+                            Reset Lockout State
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </section>
+
+        </main>
+
+    </div>
+
+
+    <script>
+
+        function showResult(response) {
+
+            if (response.ok) {
+
+                alert(
+                    "Simulation completed successfully.\n\n" +
+                    "The generated security telemetry has been added to SentinelX."
+                );
+
+            } else {
+
+                alert(
+                    "Simulation request failed.\n\n" +
+                    "HTTP Status: " + response.status
+                );
+
+            }
+
+        }
+
+
+        function runSimulation(url) {
+
+            fetch(url, {
+                method: "GET"
+            })
+                .then(function (response) {
+
+                    showResult(response);
+
+                })
+                .catch(function (error) {
+
+                    alert(
+                        "Unable to run simulation.\n\n" +
+                        error
+                    );
+
+                });
+
+        }
+
+
+        function simulateLogin() {
+
+            const attackerIP =
+                document.getElementById("attackerIP").value;
+
+            const targetIP =
+                document.getElementById("targetIP").value;
+
+            const username =
+                document.getElementById("username").value;
+
+
+            const url =
+                "/demo/login" +
+                "?source_ip=" + encodeURIComponent(attackerIP) +
+                "&destination_ip=" + encodeURIComponent(targetIP) +
+                "&username=" + encodeURIComponent(username) +
+                "&success=true";
+
+
+            runSimulation(url);
+
+        }
+
+
+        function simulatePowerShell() {
+
+            const attackerIP =
+                document.getElementById("attackerIP").value;
+
+
+            const command =
+                "powershell.exe -EncodedCommand SQBFAFgA";
+
+
+            const url =
+                "/demo/powershell" +
+                "?source_ip=" + encodeURIComponent(attackerIP) +
+                "&command=" + encodeURIComponent(command);
+
+
+            runSimulation(url);
+
+        }
+
+
+        function simulatePrivileged() {
+
+            const attackerIP =
+                document.getElementById("attackerIP").value;
+
+            const username =
+                document.getElementById("username").value;
+
+
+            const url =
+                "/demo/privileged" +
+                "?source_ip=" + encodeURIComponent(attackerIP) +
+                "&username=" + encodeURIComponent(username);
+
+
+            runSimulation(url);
+
+        }
+
+
+        function simulateFileAccess() {
+
+            const attackerIP =
+                document.getElementById("attackerIP").value;
+
+
+            const filePath =
+                "C:\\Windows\\System32\\config\\SAM";
+
+
+            const url =
+                "/demo/file-access" +
+                "?source_ip=" + encodeURIComponent(attackerIP) +
+                "&file_path=" + encodeURIComponent(filePath);
+
+
+            runSimulation(url);
+
+        }
+
+
+        function simulatePortScan() {
+
+            const attackerIP =
+                document.getElementById("attackerIP").value;
+
+            const targetIP =
+                document.getElementById("targetIP").value;
+
+
+            const url =
+                "/demo/port-scan" +
+                "?source_ip=" + encodeURIComponent(attackerIP) +
+                "&destination_ip=" + encodeURIComponent(targetIP);
+
+
+            runSimulation(url);
+
+        }
+
+
+        function runFullAttack() {
+
+            const attackerIP =
+                document.getElementById("attackerIP").value;
+
+            const targetIP =
+                document.getElementById("targetIP").value;
+
+            const username =
+                document.getElementById("username").value;
+
+
+            const url =
+                "/demo/run-full-chain" +
+                "?source_ip=" + encodeURIComponent(attackerIP) +
+                "&destination_ip=" + encodeURIComponent(targetIP) +
+                "&username=" + encodeURIComponent(username);
+
+
+            runSimulation(url);
+
+        }
+
+
+        function resetLockout() {
+
+            fetch("/demo/reset-lockout", {
+                method: "GET"
+            })
+                .then(function (response) {
+
+                    if (response.ok) {
+
+                        alert(
+                            "Lockout state has been reset successfully."
+                        );
+
+                    } else {
+
+                        alert(
+                            "Unable to reset lockout state."
+                        );
+
+                    }
+
+                })
+                .catch(function (error) {
+
+                    alert(
+                        "Reset request failed.\n\n" + error
+                    );
+
+                });
+
+        }
+
+    </script>
+
+</body>
+
+</html>
