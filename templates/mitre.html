@@ -1,0 +1,1197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SentinelX - MITRE ATT&CK</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            background: #080b12;
+            color: #e6edf3;
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        .sidebar {
+            width: 250px;
+            background: #0d111a;
+            border-right: 1px solid #1c2633;
+
+            padding: 25px 15px;
+
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+
+            overflow-y: auto;
+        }
+
+        .logo {
+            color: #00d4ff;
+            font-size: 25px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .logo-subtitle {
+            text-align: center;
+            color: #6f7d8c;
+            font-size: 11px;
+            margin-bottom: 30px;
+        }
+
+        .nav-title {
+            color: #566473;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin: 15px 10px 8px;
+        }
+
+        .nav-link {
+            display: block;
+            text-decoration: none;
+            color: #aab6c4;
+
+            padding: 12px 14px;
+
+            border-radius: 7px;
+            margin-bottom: 5px;
+
+            font-size: 14px;
+
+            transition: 0.2s;
+        }
+
+        .nav-link:hover,
+        .nav-link.active {
+            background: #111d2a;
+            color: #00d4ff;
+        }
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main {
+            margin-left: 250px;
+            width: calc(100% - 250px);
+            padding: 28px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 6px;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 13px;
+        }
+
+        .status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            background: #0d151d;
+            border: 1px solid #1d3541;
+
+            padding: 10px 15px;
+            border-radius: 20px;
+
+            font-size: 13px;
+            color: #9defff;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+
+            border-radius: 50%;
+
+            background: #00d4ff;
+
+            box-shadow: 0 0 8px #00d4ff;
+        }
+
+        /* =========================
+           INTRO
+        ========================= */
+
+        .intro {
+            background: #0d111a;
+
+            border: 1px solid #1b2633;
+            border-left: 3px solid #00d4ff;
+
+            border-radius: 9px;
+
+            padding: 18px 20px;
+
+            margin-bottom: 20px;
+        }
+
+        .intro-title {
+            color: #00d4ff;
+            font-size: 15px;
+            font-weight: bold;
+
+            margin-bottom: 8px;
+        }
+
+        .intro-text {
+            color: #8593a3;
+
+            font-size: 12px;
+
+            line-height: 1.7;
+        }
+
+        /* =========================
+           SUMMARY
+        ========================= */
+
+        .summary {
+            display: grid;
+
+            grid-template-columns: repeat(4, 1fr);
+
+            gap: 15px;
+
+            margin-bottom: 20px;
+        }
+
+        .summary-card {
+            background: #0d111a;
+
+            border: 1px solid #1b2633;
+
+            border-radius: 10px;
+
+            padding: 18px;
+        }
+
+        .summary-title {
+            color: #788697;
+
+            font-size: 11px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 25px;
+            font-weight: bold;
+
+            color: #00d4ff;
+        }
+
+        /* =========================
+           TECHNIQUE CARDS
+        ========================= */
+
+        .techniques {
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 18px;
+        }
+
+        .technique-card {
+            background: #0d111a;
+
+            border: 1px solid #1b2633;
+
+            border-radius: 10px;
+
+            padding: 20px;
+
+            transition: 0.2s;
+        }
+
+        .technique-card:hover {
+            border-color: #294052;
+        }
+
+        .technique-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 15px;
+        }
+
+        .technique-name {
+            color: #dce5ed;
+
+            font-size: 15px;
+
+            font-weight: bold;
+        }
+
+        .technique-id {
+            background: #132a38;
+
+            color: #00d4ff;
+
+            border: 1px solid #1e4659;
+
+            padding: 6px 9px;
+
+            border-radius: 5px;
+
+            font-size: 10px;
+
+            font-weight: bold;
+        }
+
+        .technique-description {
+            color: #7f8d9c;
+
+            font-size: 12px;
+
+            line-height: 1.7;
+
+            margin-bottom: 16px;
+        }
+
+        .technique-meta {
+            display: grid;
+
+            grid-template-columns: 1fr 1fr;
+
+            gap: 10px;
+        }
+
+        .meta-box {
+            background: #101720;
+
+            border: 1px solid #1a2734;
+
+            border-radius: 6px;
+
+            padding: 10px;
+        }
+
+        .meta-label {
+            color: #596a7b;
+
+            font-size: 9px;
+
+            text-transform: uppercase;
+
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            color: #aebac7;
+
+            font-size: 11px;
+        }
+
+        .risk-high {
+            color: #ff9f5c;
+        }
+
+        .risk-medium {
+            color: #ffc85c;
+        }
+
+        .risk-critical {
+            color: #ff5668;
+        }
+
+        /* =========================
+           ATT&CK FLOW
+        ========================= */
+
+        .flow-card {
+            background: #0d111a;
+
+            border: 1px solid #1b2633;
+
+            border-radius: 10px;
+
+            padding: 20px;
+
+            margin-top: 20px;
+        }
+
+        .flow-title {
+            font-size: 16px;
+
+            margin-bottom: 18px;
+        }
+
+        .flow {
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            overflow-x: auto;
+
+            padding: 5px 2px 15px;
+        }
+
+        .flow-item {
+            min-width: 150px;
+
+            background: #101720;
+
+            border: 1px solid #263442;
+
+            border-radius: 8px;
+
+            padding: 14px;
+
+            text-align: center;
+        }
+
+        .flow-number {
+            color: #00d4ff;
+
+            font-size: 10px;
+
+            font-weight: bold;
+
+            margin-bottom: 7px;
+        }
+
+        .flow-name {
+            color: #dce5ed;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            margin-bottom: 5px;
+        }
+
+        .flow-id {
+            color: #a993e8;
+
+            font-size: 10px;
+        }
+
+        .flow-arrow {
+            color: #00d4ff;
+
+            font-size: 18px;
+        }
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            margin-top: 20px;
+
+            color: #4f5d6c;
+
+            font-size: 11px;
+
+            text-align: right;
+        }
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 1050px) {
+
+            .techniques {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media (max-width: 900px) {
+
+            .summary {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+        }
+
+        @media (max-width: 800px) {
+
+            .sidebar {
+                width: 200px;
+            }
+
+            .main {
+                margin-left: 200px;
+                width: calc(100% - 200px);
+            }
+
+            .header {
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 15px;
+            }
+
+        }
+
+        @media (max-width: 600px) {
+
+            .layout {
+                display: block;
+            }
+
+            .sidebar {
+                position: relative;
+
+                width: 100%;
+            }
+
+            .main {
+                margin-left: 0;
+
+                width: 100%;
+            }
+
+            .summary {
+                grid-template-columns: 1fr;
+            }
+
+            .technique-meta {
+                grid-template-columns: 1fr;
+            }
+
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <div class="layout">
+
+
+        <!-- =========================
+         SIDEBAR
+    ========================= -->
+
+        <aside class="sidebar">
+
+            <div class="logo">
+                SENTINELX
+            </div>
+
+            <div class="logo-subtitle">
+                SOC SECURITY PLATFORM
+            </div>
+
+
+            <div class="nav-title">
+                Monitoring
+            </div>
+
+            <a href="/dashboard" class="nav-link">
+                Dashboard
+            </a>
+
+            <a href="/live-logs" class="nav-link">
+                Live Logs
+            </a>
+
+            <a href="/alerts" class="nav-link">
+                Alerts
+            </a>
+
+            <a href="/incidents" class="nav-link">
+                Incidents
+            </a>
+
+
+            <div class="nav-title">
+                Investigation
+            </div>
+
+            <a href="/attack-stories" class="nav-link">
+                Attack Stories
+            </a>
+
+            <a href="/mitre" class="nav-link active">
+                MITRE ATT&CK
+            </a>
+
+            <a href="/reports" class="nav-link">
+                Reports
+            </a>
+
+
+            <div class="nav-title">
+                Simulation
+            </div>
+
+            <a href="/attack-simulation" class="nav-link">
+                Attack Simulation
+            </a>
+
+        </aside>
+
+
+        <!-- =========================
+         MAIN
+    ========================= -->
+
+        <main class="main">
+
+
+            <!-- HEADER -->
+
+            <div class="header">
+
+                <div>
+
+                    <h1>
+                        MITRE ATT&CK
+                    </h1>
+
+                    <p>
+                        Threat technique mapping and attack behavior analysis
+                    </p>
+
+                </div>
+
+
+                <div class="status">
+
+                    <span class="status-dot"></span>
+
+                    ATT&CK Mapping Active
+
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+             INTRO
+        ========================= -->
+
+            <section class="intro">
+
+                <div class="intro-title">
+                    MITRE ATT&CK Mapping
+                </div>
+
+                <div class="intro-text">
+
+                    SentinelX maps detected security activities to
+                    MITRE ATT&CK techniques. This gives SOC analysts
+                    a standardized way to understand attacker behavior
+                    and investigate related activities.
+
+                </div>
+
+            </section>
+
+
+            <!-- =========================
+             SUMMARY
+        ========================= -->
+
+            <section class="summary">
+
+
+                <div class="summary-card">
+
+                    <div class="summary-title">
+                        Techniques
+                    </div>
+
+                    <div class="summary-value">
+                        6
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-title">
+                        Tactics Covered
+                    </div>
+
+                    <div class="summary-value">
+                        5
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-title">
+                        Mapped Alerts
+                    </div>
+
+                    <div class="summary-value">
+
+                        {% if alerts %}
+                        {{ alerts|length }}
+                        {% else %}
+                        0
+                        {% endif %}
+
+                    </div>
+
+                </div>
+
+
+                <div class="summary-card">
+
+                    <div class="summary-title">
+                        Correlation
+                    </div>
+
+                    <div class="summary-value">
+                        Active
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- =========================
+             TECHNIQUES
+        ========================= -->
+
+            <section class="techniques">
+
+
+                <!-- T1110 -->
+
+                <div class="technique-card">
+
+                    <div class="technique-header">
+
+                        <div class="technique-name">
+                            Brute Force
+                        </div>
+
+                        <div class="technique-id">
+                            T1110
+                        </div>
+
+                    </div>
+
+
+                    <div class="technique-description">
+
+                        Adversaries may use repeated authentication
+                        attempts to obtain valid credentials or gain
+                        access to an account.
+
+                    </div>
+
+
+                    <div class="technique-meta">
+
+                        <div class="meta-box">
+
+                            <div class="meta-label">
+                                SentinelX Event
+                            </div>
+
+                            <div class="meta-value">
+                                FAILED_LOGIN
+                            </div>
+
+                        </div>
+
+
+                        <div class="meta-box">
+
+                            <div class="meta-label">
+                                Severity
+                            </div>
+
+                            <div class="meta-value risk-high">
+                                HIGH
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- T1059.001 -->
+
+                <div class="technique-card">
+
+                    <div class="technique-header">
+
+                        <div class="technique-name">
+                            PowerShell
+                        </div>
+
+                        <div class="technique-id">
+                            T1059.001
+                        </div>
+
+                    </div>
+
+
+                    <div class="technique-description">
+
+                        PowerShell can be abused by attackers to execute
+                        commands and perform system administration actions
+                        after gaining access to a Windows environment.
+
+                    </div>
+
+
+                    <div class="technique-meta">
+
+                        <div class="meta-box">
+
+                            <div class="meta-label">
+                                SentinelX Event
+                            </div>
+
+                            <div class="meta-value">
+                                POWERSHELL
+                            </div>
+
+                        </div>
+
+
+                        <div class="meta-box">
+
+                            <div class="meta-label">
+                                Severity
+                            </div>
+
+                            <div class="meta-value risk-high">
+                                HIGH
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- T1078 -->
+
+                <div class="technique-card">
+
+                    <div class="technique-header">
+
+                        <div class="technique-name">
+                            Valid Accounts
+                        </div>
+
+                        <div class="technique-id">
+                            T1078
+                        </div>
+
+                    </div>
+
+
+                    <div class="technique-description">
+
+                        Attackers may use legitimate account credentials
+                        to access systems and perform actions while
+                        appearing to be an authorized user.
+
+                    </div>
+
+
+                    <div class="technique-meta">
+
+                        <div class="meta-box">
+
+                            <div class="meta-label">
+                                SentinelX Event
+                            </div>
+
+                            <div class="meta-value">
+                                PRIVILEGED_ACTIVITY
+                            </div>
+
+                        </div>
+
+
+                        <div class="meta-box">
+
+                            <div class="meta-label">
+                                Severity
+                            </div>
+
+                            <div class="meta-value risk-high">
+                                HIGH
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- T1005 -->
+
+                <div class="technique-card">
+
+                    <div class="technique-header">
+
+                        <div class="technique-name">
+                            Data from Local System
+                        </div>
+
+                        <div class="technique-id">
+                            T1005
+                        </div>
+
+                    </div>
+
+
+                    <div class="technique-description">
+
+                        Attackers may search and collect data from local
+                        systems after gaining access to a compromised
+                        environment.
+
+                    </div>
+
+
+                    <div class="technique-meta">
+
+                        <div class="meta-box">
+
+                            <div class="meta-label">
+                                SentinelX Event
+                            </div>
+
+                            <div class="meta-value">
+                                FILE_ACCESS
+                            </div>
+
+                        </div>
+
+
+                        <div class="meta-box">
+
+                            <div class="meta-label">
+                                Severity
+                            </div>
+
+                            <div class="meta-value risk-high">
+                                HIGH
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- T1046 -->
+
+                <div class="technique-card">
+
+                    <div class="technique-header">
+
+                        <div class="technique-name">
+                            Network Service Scanning
+                        </div>
+
+                        <div class="technique-id">
+                            T1046
+                        </div>
+
+                    </div>
+
+
+                    <div class="technique-description">
+
+                        Adversaries may scan systems and network services
+                        to identify available ports, services and possible
+                        attack targets.
+
+                    </div>
+
+
+                    <div class="technique-meta">
+
+                        <div class="meta-box">
+
+                            <div class="meta-label">
+                                SentinelX Event
+                            </div>
+
+                            <div class="meta-value">
+                                PORT_SCAN
+                            </div>
+
+                        </div>
+
+
+                        <div class="meta-box">
+
+                            <div class="meta-label">
+                                Severity
+                            </div>
+
+                            <div class="meta-value risk-high">
+                                HIGH
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- T1110 ACCOUNT LOCKOUT -->
+
+                <div class="technique-card">
+
+                    <div class="technique-header">
+
+                        <div class="technique-name">
+                            Account Lockout
+                        </div>
+
+                        <div class="technique-id">
+                            T1110
+                        </div>
+
+                    </div>
+
+
+                    <div class="technique-description">
+
+                        Repeated authentication failures can trigger
+                        account protection mechanisms and indicate
+                        password guessing or brute-force behavior.
+
+                    </div>
+
+
+                    <div class="technique-meta">
+
+                        <div class="meta-box">
+
+                            <div class="meta-label">
+                                SentinelX Alert
+                            </div>
+
+                            <div class="meta-value">
+                                ACCOUNT_LOCKOUT
+                            </div>
+
+                        </div>
+
+
+                        <div class="meta-box">
+
+                            <div class="meta-label">
+                                Risk Score
+                            </div>
+
+                            <div class="meta-value risk-high">
+                                80
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+            </section>
+
+
+            <!-- =========================
+             ATTACK FLOW
+        ========================= -->
+
+            <section class="flow-card">
+
+                <h2 class="flow-title">
+                    SentinelX Attack Technique Flow
+                </h2>
+
+
+                <div class="flow">
+
+
+                    <div class="flow-item">
+
+                        <div class="flow-number">
+                            STEP 01
+                        </div>
+
+                        <div class="flow-name">
+                            Brute Force
+                        </div>
+
+                        <div class="flow-id">
+                            T1110
+                        </div>
+
+                    </div>
+
+
+                    <div class="flow-arrow">
+                        →
+                    </div>
+
+
+                    <div class="flow-item">
+
+                        <div class="flow-number">
+                            STEP 02
+                        </div>
+
+                        <div class="flow-name">
+                            PowerShell
+                        </div>
+
+                        <div class="flow-id">
+                            T1059.001
+                        </div>
+
+                    </div>
+
+
+                    <div class="flow-arrow">
+                        →
+                    </div>
+
+
+                    <div class="flow-item">
+
+                        <div class="flow-number">
+                            STEP 03
+                        </div>
+
+                        <div class="flow-name">
+                            Valid Accounts
+                        </div>
+
+                        <div class="flow-id">
+                            T1078
+                        </div>
+
+                    </div>
+
+
+                    <div class="flow-arrow">
+                        →
+                    </div>
+
+
+                    <div class="flow-item">
+
+                        <div class="flow-number">
+                            STEP 04
+                        </div>
+
+                        <div class="flow-name">
+                            File Access
+                        </div>
+
+                        <div class="flow-id">
+                            T1005
+                        </div>
+
+                    </div>
+
+
+                    <div class="flow-arrow">
+                        →
+                    </div>
+
+
+                    <div class="flow-item">
+
+                        <div class="flow-number">
+                            STEP 05
+                        </div>
+
+                        <div class="flow-name">
+                            Port Scanning
+                        </div>
+
+                        <div class="flow-id">
+                            T1046
+                        </div>
+
+                    </div>
+
+
+                </div>
+
+            </section>
+
+
+            <div class="footer">
+
+                SentinelX Security Monitoring Platform
+
+            </div>
+
+
+        </main>
+
+
+    </div>
+
+
+</body>
+
+</html>
